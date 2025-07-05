@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Volume Control with Hand Tracking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function pauseVideo() {
+            document.getElementById("video-stream").style.display = "none";
+        }
+
+        function startVideo() {
+            document.getElementById("video-stream").style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <h1>🎚️ Live Volume Control with Hand Gestures</h1>
+
+    <div>
+        <img id="video-stream" src="{{ url_for('video_feed') }}" width="640" height="480" alt="Camera Feed">
+    </div>
+
+    <div class="btn-container">
+        <button onclick="startVideo()">▶️ Start</button>
+        <button onclick="pauseVideo()">⏸️ Pause</button>
+    </div>
+</body>
+</html>
