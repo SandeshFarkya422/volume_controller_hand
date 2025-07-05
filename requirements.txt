@@ -6,3 +6,4 @@ pycaw
 comtypes
 setuptools>=65.0
 wheel
+build
