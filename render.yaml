@@ -1,8 +1,7 @@
 services:
   - type: web
-    name: volume-controller-app
+    name: volume-controller-hand
     env: python
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
-    branch: main
-    plan: free
+    pythonVersion: 3.10.12
