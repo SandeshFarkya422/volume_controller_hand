@@ -13,35 +13,38 @@
   <button onclick="capture()">📸 Send Frame</button>
 
   <script>
-    const video = document.getElementById("webcam");
-    const canvas = document.createElement("canvas");
+  const video = document.getElementById("webcam");
+  const canvas = document.createElement("canvas");
 
-    navigator.mediaDevices.getUserMedia({ video: true })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(err => {
-        alert("Camera access denied.");
-        console.error(err);
-      });
+  navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+      video.srcObject = stream;
 
-    function capture() {
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
-      canvas.getContext('2d').drawImage(video, 0, 0);
-      const imageData = canvas.toDataURL('image/jpeg');
+      // 🔁 Keep sending frames every 300ms
+      setInterval(capture, 300);
+    })
+    .catch(err => {
+      alert("Camera access denied.");
+      console.error(err);
+    });
 
-      fetch('/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ image: imageData })
-      })
-      .then(res => res.json())
-      .then(data => {
-        alert('Volume action: ' + data.result);
-      })
-      .catch(err => console.error(err));
-    }
-  </script>
+  function capture() {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d').drawImage(video, 0, 0);
+    const imageData = canvas.toDataURL('image/jpeg');
+
+    fetch('/predict', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: imageData })
+    })
+    .then(res => res.json())
+    .then(data => {
+      console.log('Gesture:', data.result);
+    })
+    .catch(err => console.error(err));
+  }
+</script>
 </body>
 </html>
