@@ -1,39 +1,31 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, request, jsonify
 import cv2
-import Volume_Control as vc  # This file contains your hand tracking logic
-import threading
-import webbrowser
+import numpy as np
+import base64
+import Volume_Control as vc
 
 app = Flask(__name__)
 
-def generate_frames():
-    cap = cv2.VideoCapture(0)  # ✅ Open camera ONLY here
-    while True:
-        success, frame = cap.read()
-        if not success:
-            break
-
-        frame = vc.process_frame(frame)
-
-        ret, buffer = cv2.imencode('.jpg', frame)
-        frame = buffer.tobytes()
-
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-    cap.release()  # ✅ Release when done
-
 @app.route('/')
 def index():
-    return render_template('index.html')  # ✅ HTML load first
+    return render_template('index.html')
 
-@app.route('/video_feed')
-def video_feed():
-    return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+@app.route('/predict', methods=['POST'])
+def predict():
+    data = request.get_json()
+    if 'image' not in data:
+        return jsonify({'error': 'No image'}), 400
+
+    img_data = data['image'].split(',')[1]
+    img_bytes = base64.b64decode(img_data)
+    np_arr = np.frombuffer(img_bytes, np.uint8)
+    img = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+
+    # 🔁 Your volume control logic here
+    processed_img = vc.process_frame(img)
+    result = "Volume adjusted (simulated)"
+
+    return jsonify({'result': result})
 
 if __name__ == '__main__':
-    # ✅ Auto-open browser AFTER Flask starts
-    threading.Timer(1.25, lambda: webbrowser.open('http://127.0.0.1:5000')).start()
     app.run(debug=True)
-
-
