@@ -1,28 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Volume Control with Hand Tracking</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script>
-        function pauseVideo() {
-            document.getElementById("video-stream").style.display = "none";
-        }
-
-        function startVideo() {
-            document.getElementById("video-stream").style.display = "block";
-        }
-    </script>
+  <title>Live Volume Control</title>
+  <style>
+    video { border: 2px solid black; border-radius: 8px; }
+  </style>
 </head>
 <body>
-    <h1>🎚️ Live Volume Control with Hand Gestures</h1>
+  <h1>🎥 Hand Tracking via Client Camera</h1>
+  <video id="webcam" autoplay playsinline width="640" height="480"></video>
+  <br>
+  <button onclick="capture()">📸 Send Frame</button>
 
-    <div>
-        <img id="video-stream" src="{{ url_for('video_feed') }}" width="640" height="480" alt="Camera Feed">
-    </div>
+  <script>
+    const video = document.getElementById("webcam");
+    const canvas = document.createElement("canvas");
 
-    <div class="btn-container">
-        <button onclick="startVideo()">▶️ Start</button>
-        <button onclick="pauseVideo()">⏸️ Pause</button>
-    </div>
+    navigator.mediaDevices.getUserMedia({ video: true })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        alert("Camera access denied.");
+        console.error(err);
+      });
+
+    function capture() {
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      canvas.getContext('2d').drawImage(video, 0, 0);
+      const imageData = canvas.toDataURL('image/jpeg');
+
+      fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: imageData })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert('Volume action: ' + data.result);
+      })
+      .catch(err => console.error(err));
+    }
+  </script>
 </body>
 </html>
