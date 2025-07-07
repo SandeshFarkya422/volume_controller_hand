@@ -9,3 +9,4 @@ mediapipe==0.10.14
 
 # Install pycaw only on Windows
 pycaw==20220325; sys_platform == "win32"
+comtypes==1.1.14; sys_platform == "win32"
