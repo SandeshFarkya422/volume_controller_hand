@@ -88,8 +88,12 @@ class HandTDection:
         self.trackCon = trackCon
 
         self.mpHands = mp.solutions.hands
-        self.hands = self.mpHands.Hands(self.mode, self.maxHands,
-                                        self.detectionCon, self.trackCon)
+        self.hands = self.mpHands.Hands(
+            static_image_mode=self.mode,
+            max_num_hands=self.maxHands,
+            min_detection_confidence=self.detectionCon,
+            min_tracking_confidence=self.trackCon
+        )
         self.mpDraw = mp.solutions.drawing_utils
 
     def findHands(self, img, draw=True):
@@ -99,8 +103,7 @@ class HandTDection:
         if self.results.multi_hand_landmarks:
             for handLms in self.results.multi_hand_landmarks:
                 if draw:
-                    self.mpDraw.draw_landmarks(img, handLms,
-                                               self.mpHands.HAND_CONNECTIONS)
+                    self.mpDraw.draw_landmarks(img, handLms, self.mpHands.HAND_CONNECTIONS)
         return img
 
     def findPosition(self, img, handNo=0, draw=True):
@@ -116,6 +119,7 @@ class HandTDection:
                     cv2.circle(img, (cx, cy), 5, (255, 0, 0), cv2.FILLED)
 
         return lmList
+
 
 
 
