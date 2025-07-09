@@ -1,12 +1,4 @@
-setuptools>=65.0
-wheel
-build
-flask==2.2.5
-gunicorn==20.1.0
-numpy==1.24.4
+streamlit
 opencv-python==4.7.0.72
 mediapipe==0.10.14
-
-# Install pycaw only on Windows
-pycaw==20220325; sys_platform == "win32"
-comtypes==1.1.14; sys_platform == "win32"
+numpy==1.24.4
